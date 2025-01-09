@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Login Form</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- MATERIAL DESIGN ICONIC FONT -->
+		<link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
+
+		<!-- STYLE static -->
+        {% load static %}
+        <link href="{% static 'loginstyle.css'%}" rel="stylesheet">
+	</head>
+
+	<body>
+
+		<div class="wrapper" style="background-image: url('static/bg.jpg');">
+			{% if messages %}
+				<ul>
+					{% for message in messages %}
+						<li>{{ message }}</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+			<div class="inner">
+				<form method="post">
+					{% csrf_token %}
+					<h3>Login</h3>
+					<div class="form-wrapper">
+						<label for="username">Email</label>
+						<input name="username" type="text" class="form-control">
+					</div>
+					<div class="form-wrapper">
+						<label for="pswd">Password</label>
+						<input name="pswd" type="password" class="form-control">
+					</div>
+					<button type="submit">Login Now</button><br><br>
+					<div class="checkbox">
+						<label>
+							I don't have an account <a href="/register" class="no-underline">REGISTER</a>
+						</label>
+					</div>
+				</form>
+
+			</div>
+		</div>
+
+	</body>
+</html>

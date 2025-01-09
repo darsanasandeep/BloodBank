@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Donor Registration</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- MATERIAL DESIGN ICONIC FONT -->
+		<link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
+
+		<!-- STYLE static -->
+        {% load static %}
+        <link href="{% static 'loginstyle.css'%}" rel="stylesheet">
+	</head>
+
+	<body>
+
+		<div class="wrapper" style="background-image: url('static/bg.jpg');">
+			<div class="inner">
+				<form method="post">
+					{% csrf_token %}
+					<h3>Donor Registration</h3>
+
+                    <div class="form-wrapper">
+                        <label for="fname">Blood Group</label>
+                        <select name="fname" id='fname' class="form-control">
+                            <option value="">Select Donor Name</option>
+                            {% for donor in donors %}
+                                <option value="{{ donor.fullname }}">{{ donor.fullname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-wrapper">
+						<label for="qunty">Quantity</label>
+						<input name="qunty" type="number" class="form-control" required>
+					</div>
+
+					<button type="submit">Register</button>
+
+
+				</form>
+
+			</div>
+		</div>
+
+	</body>
+</html>

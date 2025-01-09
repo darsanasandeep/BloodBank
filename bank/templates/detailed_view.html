@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css'>
+
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js'></script>
+    <style>
+        .hbody{
+            margin-top:20px;
+            color: #1a202c;
+            text-align: left;
+            background-color: #e2e8f0;
+        }
+        .main-body {
+            padding: 15px;
+        }
+        .card {
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+        }
+
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 0 solid rgba(0,0,0,.125);
+            border-radius: .25rem;
+        }
+
+        .card-body {
+            flex: 1 1 auto;
+            min-height: 1px;
+            padding: 1rem;
+        }
+
+        .gutters-sm {
+            margin-right: -8px;
+            margin-left: -8px;
+        }
+
+        .gutters-sm>.col, .gutters-sm>[class*=col-] {
+            padding-right: 8px;
+            padding-left: 8px;
+        }
+        .mb-3, .my-3 {
+            margin-bottom: 1rem!important;
+        }
+
+        .bg-gray-300 {
+            background-color: #e2e8f0;
+        }
+        .h-100 {
+            height: 100%!important;
+        }
+        .shadow-none {
+            box-shadow: none!important;
+        }
+    </style>
+</head>
+<body class="hbody">
+    <div class="container">
+    <div class="main-body">
+
+          <!-- Breadcrumb -->
+          <nav aria-label="breadcrumb" class="main-breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/viewdonor">Home</a></li>
+              <li class="breadcrumb-item"><a href="detailedview">User Profile</a></li>
+            </ol>
+          </nav>
+          <!-- /Breadcrumb -->
+
+          <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex flex-column align-items-center text-center">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" class="rounded-circle" width="150">
+                    <div class="mt-3">
+                      <h4>{{donor.fullname}}</h4>
+                      <p class="text-secondary mb-1">{{donor.full_name}}</p>
+                      <p class="text-muted font-size-sm">Bay Area, San Francisco, CA</p>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+              <div class="col-lg-8">
+				  <form method="post" action="/updatedonor/{{donor.id}}">
+    				{% csrf_token %}
+						<div class="card">
+							<div class="card-body">
+								<div class="row mb-3">
+									<div class="col-sm-3">
+										<h6 class="mb-0">Full Name</h6>
+									</div>
+									<div class="col-sm-4 text-secondary">
+										<input type="text" name="fname" class="form-control" value="{{ donor.fullname }}">
+									</div>
+									<div class="col-sm-1">
+										<h6 class="mb-0">Age</h6>
+									</div>
+									<div class="col-sm-4 text-secondary">
+										<input type="text" name="age" class="form-control" value="{{donor.age}}">
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-sm-3">
+										<h6 class="mb-0">Email</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										<input type="text" name="email" class="form-control" value="{{donor.email}}">
+									</div>
+								</div>
+								<div class="row mb-3">
+									<div class="col-sm-3">
+										<h6 class="mb-0">Mobile</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										<input type="text" name="phone" class="form-control" value="{{donor.mobile_number}}">
+									</div>
+								</div>
+								<div class="row mb-3">
+									<div class="col-sm-3">
+										<h6 class="mb-0">Address</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										<input type="text" name="addrs" class="form-control" value="{{donor.address}}">
+									</div>
+								</div>
+								<div class="row mb-3">
+									<div class="col-sm-3">
+										<h6 class="mb-0">Gender</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										<input type="text" name="gender" class="form-control" value="{{donor.gender}}">
+									</div>
+								</div>
+								<div class="row mb-3">
+									<div class="col-sm-3">
+										<h6 class="mb-0">Health</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										<input type="text" name="health" class="form-control" value="{{donor.health_issue}}">
+									</div>
+								</div>
+								<div class="row mb-3">
+									<div class="col-sm-3">
+										<h6 class="mb-0">Blood Group</h6>
+									</div>
+									<div class="col-sm-4 text-secondary">
+										<select name="group" class="form-control">
+											<option value="A+" {% if donor.blood_type == "A+" %}selected{% endif %}>A+</option>
+											<option value="A-" {% if donor.blood_type == "A-" %}selected{% endif %}>A-</option>
+											<option value="B+" {% if donor.blood_type == "B+" %}selected{% endif %}>B+</option>
+											<option value="B-" {% if donor.blood_type == "B-" %}selected{% endif %}>B-</option>
+											<option value="O+" {% if donor.blood_type == "O+" %}selected{% endif %}>O+</option>
+											<option value="O-" {% if donor.blood_type == "O-" %}selected{% endif %}>O-</option>
+											<option value="AB+" {% if donor.blood_type == "AB+" %}selected{% endif %}>AB+</option>
+											<option value="AB-" {% if donor.blood_type == "AB-" %}selected{% endif %}>AB-</option>
+										</select>
+									</div>
+									<div class="col-sm-2">
+										<h6 class="mb-0">Quantity</h6>
+									</div>
+									<div class="col-sm-3 text-secondary">
+										<input type="text" name="qunty" class="form-control" value="{{donor.quantity}}">
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-sm-3">
+										<h6 class="mb-0">Status</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										<select name="status" class="form-control">
+											<option value="PENDING" {% if donor.status == "PENDING" %}selected{% endif %}>PENDING</option>
+											<option value="APPROVED" {% if donor.status == "APPROVED" %}selected{% endif %}>APPROVED</option>
+											<option value="REJECTED" {% if donor.status == "REJECTED" %}REJECTED{% endif %}>REJECTED</option>
+										</select>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-3"></div>
+									<div class="col-sm-9 text-secondary">
+										<input type="submit" class="btn btn-primary px-4" value="Save Changes">
+									</div>
+								</div>
+							</div>
+						</div>
+				  </form>
+          </div>
+    </div>
+    </div>
+</body>
+</html>

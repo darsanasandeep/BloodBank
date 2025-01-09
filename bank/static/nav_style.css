@@ -1,0 +1,65 @@
+/* Navbar gradient background */
+	body{
+		background-color: #495057;
+	}
+    .navbar-custom {
+      background-color: rgb(255, 255, 255);
+    }
+
+    /* Dropdown menu styling */
+    .dropdown-menu {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-item:hover {
+		background-color: #33e1e7;
+		color: #fbfbfb;
+		border-radius: 10px; /* Makes the dropdown hover effect cylindrical */
+	}
+
+    /* Navbar link colors */
+    .navbar-brand, .nav-link {
+      transition: color 0.3s ease;
+    }
+    .nav-link{
+        color:black;
+    }
+
+    .nav-link:hover {
+		background-color: #33e1e7;
+		color: #fbfbfb;
+		border-radius: 10px; /* Makes the hover effect cylindrical */
+	}
+
+    /* Toggler icon styling */
+    .navbar-toggler-icon {
+      background-color: #33e1e7;
+    }
+
+    /* Dropdown hover functionality */
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-toggle::after {
+      display: none; /* Remove dropdown arrow */
+    }
+
+    .background {
+      background-image: url('img1.jpg'); /* Replace with your image */
+      background-size: cover;
+
+      height: 100vh; /* Full viewport height */
+      padding-top: 60px; /* Adjust to match navbar height */
+      text-align: center;
+      color: white;
+    }
+
+    .split {
+      float: left;
+      background-color: white;
+      color: black;
+    }

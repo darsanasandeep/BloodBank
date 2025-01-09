@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Web Component</title>
+    {% load static %}
+    <link href="{% static 'style.css'%}" rel="stylesheet">
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css'>
+
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js'></script>
+</head>
+    <body>
+        <div class="container">
+            <!-- Breadcrumb -->
+              <nav aria-label="breadcrumb" class="main-breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/adminhome">Home</a></li>
+                  <li class="breadcrumb-item"><a href="/viewdonor">Donor List</a></li>
+                </ol>
+              </nav><br><br>
+              <!-- /Breadcrumb -->
+            <div class="controls">
+                <a href="/viewdonor/" class="filter-btn" style="text-decoration: none;">All</a>
+                <a href="/viewdonor/APPROVED" class="filter-btn" style="text-decoration: none;">Approved</a>
+                <a href="/viewdonor/REJECTED" class="filter-btn" style="text-decoration: none;">Rejected</a>
+                <a href="/viewdonor/PENDING" class="filter-btn" style="text-decoration: none;">Pending</a>
+                <form method="GET" action="" style="display: inline;">
+                    <input type="text" name="search" class="search-input" placeholder="Search donors..." value="{{ search_query }}">
+                </form>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead class="table-header">
+                        <tr class="table-header-row">
+                            <th class="key-heading">No.</th>
+                            <th class="key-heading">Name</th>
+                            <th class="status-heading">Email</th>
+                            <th class="date-heading">Phone</th>
+                            <th class="price-heading">Blood group</th>
+                            <th class="price-heading">Status</th>
+                            <th class="price-heading">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for donor in donors %}
+                            <tr>
+                                <td>{{ donor.id }}</td>
+                                <td>{{ donor.fullname }}</td>
+                                <td>{{ donor.email }}</td>
+                                <td>{{ donor.mobile_number }}</td>
+                                <td>{{ donor.blood_type }}</td>
+                                <td>
+                                    <span
+                                        style="color: {% if donor.status == 'Approved' %} green
+                                                    {% elif donor.status == 'Rejected' %} red
+                                                    {% else %} #d1a819
+                                                    {% endif %};">
+                                        {{ donor.status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/detailedview/{{donor.id}}" class="filter-btn" >View</a>
+                                    <a href="/deletedonor/{{donor.id}}" class="filter-btn">Delete</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

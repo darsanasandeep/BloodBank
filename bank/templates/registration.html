@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>RegistrationForm</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- MATERIAL DESIGN ICONIC FONT -->
+		<link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
+
+		<!-- STYLE static -->
+        {% load static %}
+        <link href="{% static 'loginstyle.css'%}" rel="stylesheet">
+	</head>
+
+	<body>
+
+		<div class="wrapper" style="background-image: url('static/bg.jpg');">
+			<div class="inner">
+				{% if messages %}
+					<ul>
+						{% for message in messages %}
+							<li>{{ message }}</li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+				<form method="post">
+					{% csrf_token %}
+					<h3>Registration Form</h3>
+						{% for field in form %}
+							<div class="form-wrapper">
+								{{ field.label_tag }}  <!-- Automatically associates label with input -->
+								<input type="{% if field.field.widget.input_type == 'password' %}password{% else %}text{% endif %}"
+										name="{{ field.html_name }}"
+										id="{{ field.id_for_label }}"
+										class="form-control">  <!-- Renders the form field with its widget -->
+							</div>
+						{% endfor %}
+					<button>Register Now</button><br><br>
+					<div class="checkbox">
+						<label>
+							I already have an account <a href="/" class="no-underline">LOGIN</a>
+						</label>
+					</div>
+				</form>
+			</div>
+		</div>
+
+	</body>
+</html>
