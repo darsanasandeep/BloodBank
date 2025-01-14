@@ -15,7 +15,6 @@ urlpatterns = [
         path('updatedonor/<int:id>',views.update_donor),
         path('deletedonor/<int:id>',views.delete_donor),
         path('inventorylist',views.get_inventory),
-        path('collect/<int:id>',views.collect_inventory)
-
+        path('collect/<int:id>',views.collect_inventory),
 ]
 
