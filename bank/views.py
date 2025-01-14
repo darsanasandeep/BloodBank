@@ -1,11 +1,13 @@
+from statistics import quantiles
+
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from bank.forms import ExtendedUserCreationForm
-from bank.models import BloodDonor, BloodInventory
+from bank.models import BloodDonor, BloodInventory, DonationList
 
 
 def user_registration(request):
@@ -61,7 +63,6 @@ def register_donor(request):
         health = request.POST['health']
         health_issue = request.POST['other-condition']
         group = request.POST['group']
-        qunty = request.POST['qunty']
         status = 'PENDING'
 
         # if health_issue is not None and health != 'none':
@@ -71,7 +72,7 @@ def register_donor(request):
             health = health_issue
 
         donor = BloodDonor(fullname=name,age=age,email=email,mobile_number=phone,address=address,
-                               gender=gender,health_issue=health,blood_type=group,quantity=qunty,status=status)
+                               gender=gender,health_issue=health,blood_type=group,status=status)
         donor.save()
         return redirect('/viewdonor')
     return render(request,'add_donor.html')
@@ -112,7 +113,6 @@ def update_donor(request, id):
         donor.health_issue = request.POST['health']
 
         donor.blood_type = request.POST['group']
-        donor.quantity = request.POST['qunty']
         donor.status = request.POST['status']
 
         donor.save()
@@ -131,13 +131,21 @@ def get_inventory(request):
     return render(request,'view_inventory.html',{'inventory':inventory})
 
 def collect_inventory(request,id):
-    inventory = BloodInventory.objects.get(id=id)
+    inventory = get_object_or_404(BloodInventory, id=id)
 
     if request.method == 'POST':
-        inventory.available_qnty += float (request.POST['qunty'])
+        quantity = float(request.POST['qunty'])
+        inventory.available_qnty += quantity
         inventory.save()
 
-    return render(request,'collect.html')
+        # Update donor collection status
+        donor = get_object_or_404(BloodDonor, id=request.POST['donor'])
+        data_list = DonationList(donor_id =donor.id ,name =donor.fullname ,blood_type = donor.blood_type,quantity = quantity ,status=True)
+        data_list.save()
+        return redirect('/inventorylist')
+
+    donors = BloodDonor.objects.filter(status='APPROVED')
+    return render(request,'collect.html',{'donors': donors})
 
 
 def supply_inventory(request, id):
@@ -148,7 +156,3 @@ def supply_inventory(request, id):
         inventory.save()
 
     return render(request, 'supply_invent.html')
-
-def donor_list(request):
-    donors = BloodDonor.objects.all()  # Fetch all records
-    return render(request, 'collect.html', {'donors': donors})
