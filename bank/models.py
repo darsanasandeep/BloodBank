@@ -21,12 +21,15 @@ class BloodInventory(models.Model):
     available_qnty = models.FloatField(null=False)
 
 
-class BloodRequest(models.Model):
+class UserBloodRequest(models.Model):
     request = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=False)
-    age = models.IntegerField(null=True)
-    mobile_number = models.CharField(max_length=100, null=True)
-    address = models.CharField(max_length=100, null=True)
+    age = models.IntegerField(null=False)
+    email = models.EmailField(max_length=100, null=False,default=None)
+    mobile_number = models.CharField(max_length=100, null=False)
+    address = models.CharField(max_length=100, null=False)
+    gender = models.CharField(max_length=100, null=False)
+    health_issue = models.CharField(max_length=200, null=False)
     blood_type = models.CharField(max_length=100, null=False)
     quantity = models.FloatField(null=False)
     status = models.CharField(max_length=100, null=False)
@@ -38,6 +41,8 @@ class DonationList(models.Model):
     blood_type = models.CharField(max_length=100, null=False)
     quantity = models.FloatField(null=False)
     status = models.BooleanField(default=False,null=False)
+
+
 
 
 
