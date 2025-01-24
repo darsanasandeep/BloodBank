@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Blood Donation</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- MATERIAL DESIGN ICONIC FONT -->
+		<link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
+
+		<!-- STYLE static -->
+        {% load static %}
+        <link href="{% static 'loginstyle.css'%}" rel="stylesheet">
+	</head>
+
+	<body>
+
+		<div class="wrapper" style="background-image: url('static/bg.jpg');">
+			<div class="inner">
+				<form method="post">
+					{% csrf_token %}
+					<h3>Supply Blood</h3>
+
+                    {% if error_message %}
+                    <div style="color: red; margin-bottom: 15px;">
+                        {{ error_message }}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-wrapper">
+						<label for="requst">Request ID </label>
+						<select name="requst" id="requst" class="form-control" onchange="updateQuantity(this.value)">
+							<option value="">Select Donor ID</option>
+							{% for data in reqt %}
+								<option value="{{ data.id }}" data-quantity="{{ data.quantity }}">{{ data.id }} - {{ data.name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+
+                    <div class="form-wrapper">
+						<label for="qunty">Quantity</label>
+						<input name="qunty" id="qunty" type="text" class="form-control" readonly required>
+					</div>
+
+					<div style="display: flex; align-items: center; justify-content: flex-start;">
+					  <button type="submit" style="background-color: red; margin-right: 8px; padding: 10px 20px; border: none; color: white; cursor: pointer;">Supply</button>
+					  <a href="inventorylist" style="background-color: green; padding: 10px 25px; text-decoration: none; color: white; cursor: pointer; border-radius: 50px; display: inline-block;">Back</a>
+					</div>
+
+
+				</form>
+
+			</div>
+
+			<script>
+				function updateQuantity(selectedId) {
+					const select = document.getElementById('requst');
+					const option = select.options[select.selectedIndex];
+					const quantity = option.getAttribute('data-quantity');
+					document.getElementById('qunty').value = quantity || '';
+				}
+			</script>
+
+		</div>
+
+	</body>
+
+</html>

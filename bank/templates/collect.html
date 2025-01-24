@@ -11,6 +11,15 @@
 		<!-- STYLE static -->
         {% load static %}
         <link href="{% static 'loginstyle.css'%}" rel="stylesheet">
+		<div class="container">
+            <!-- Breadcrumb -->
+              <nav aria-label="breadcrumb" class="main-breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/adminhome">Home</a></li>
+                  <li class="breadcrumb-item"><a href="/viewdonor">Request List</a></li>
+                </ol>
+              </nav><br><br>
+              <!-- /Breadcrumb -->
 	</head>
 
 	<body>
@@ -19,7 +28,7 @@
 			<div class="inner">
 				<form method="post">
 					{% csrf_token %}
-					<h3>Donor Registration</h3>
+					<h3>Collect Blood</h3>
 
                     <div class="form-wrapper">
 						<label for="donor">Donor ID </label>
@@ -35,7 +44,9 @@
 						<label for="qunty">Quantity</label>
 						<input name="qunty" type="text" class="form-control" required>
 					</div>
-					<button type="submit">Register</button>
+
+					<button type="submit">Collect</button>
+
 
 
 				</form>

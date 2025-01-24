@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
 from bank.forms import ExtendedUserCreationForm
-from bank.models import BloodDonor, BloodInventory, DonationList
+from bank.models import BloodDonor, BloodInventory, DonationList, UserBloodRequest
 
 
 def user_registration(request):
@@ -149,10 +149,108 @@ def collect_inventory(request,id):
 
 
 def supply_inventory(request, id):
-    inventory = BloodInventory.objects.get(id=id)
+    inventory = get_object_or_404(BloodInventory, id=id)
 
     if request.method == 'POST':
-        inventory.available_qnty -= float (request.POST['qunty'])
+        quantity = float(request.POST['qunty'])
+
+        if quantity > inventory.available_qnty:
+            # Return an error message if the entered quantity exceeds available quantity
+            reqt = UserBloodRequest.objects.filter(status='APPROVED')
+            return render(request, 'supply.html', {
+                'reqt': reqt,
+                'error_message': 'Entered quantity exceeds available inventory.'
+            })
+
+        inventory.available_qnty -= quantity
         inventory.save()
 
-    return render(request, 'supply_invent.html')
+        # Update donor collection status
+        data = get_object_or_404(UserBloodRequest, id=request.POST['requst'])
+        data.status = 'RECEIVED'
+        data.save()
+        return redirect('/inventorylist')
+
+    reqt = UserBloodRequest.objects.filter(status='APPROVED')
+    return render(request, 'supply.html', {'reqt': reqt})
+
+def view_blood_request(request):
+    datas = UserBloodRequest.objects.all()
+    return render(request, 'view_request.html', {'datas': datas})
+
+
+def register_request(request):
+    user_id = request.user.id
+
+    if request.method == 'POST':
+        name = request.POST['fname']
+        age = request.POST['age']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        gender = request.POST.get('gender', None)
+        address = request.POST['addrs']
+        health = request.POST['reason']
+        group = request.POST['group']
+        quantity = request.POST['qunty']
+        status = 'PENDING'
+
+        datas = UserBloodRequest(name=name,age=age,email=email,mobile_number=phone,address=address,gender=gender,
+                        health_issue=health,blood_type=group,quantity= quantity,status=status,request_id=user_id)
+        datas.save()
+        return redirect('/requestlist')
+    return render(request,'request_form.html')
+
+def user_request_list(request,status=None):
+    search_data = request.GET.get('search', '').strip()
+    if search_data:
+        reqt = UserBloodRequest.objects.filter(
+            Q(name__icontains=search_data) |
+            Q(blood_type__icontains=search_data) |
+            Q(status__icontains=search_data)
+        )
+
+    elif status and status.upper() in ["APPROVED", "REJECTED", "PENDING"]:
+        reqt = UserBloodRequest.objects.filter(status=status.upper())
+    else:
+        reqt = UserBloodRequest.objects.all()
+
+    return render(request, 'req_verification.html', {'reqt': reqt})
+
+def approve_reject_request(request,id,status=None):
+    reqt = get_object_or_404(UserBloodRequest, id=id)
+    if status and status.upper() in ["APPROVED", "REJECTED"]:
+        reqt.status = status
+        reqt.save()
+        return redirect('/viewrequest')
+    return render(request, 'approve_reject.html',{'data':reqt})
+
+def update_request(request, id):
+    reqt = get_object_or_404(UserBloodRequest, id=id)
+
+    if request.method == 'POST':
+        reqt.name = request.POST['fname']
+        reqt.age = request.POST['age']
+        reqt.email = request.POST['email']
+        reqt.mobile_number = request.POST['phone']
+        reqt.gender = request.POST.get('gender', None)
+        reqt.address = request.POST['addrs']
+        reqt.health_issue = request.POST['health']
+        reqt.blood_type = request.POST['group']
+        reqt.quantity = request.POST['qunty']
+        reqt.save()
+        return redirect('/requestlist')
+
+    return render(request, 'approve_reject.html')
+
+
+def delete_request(request, id):
+    reqt = get_object_or_404(UserBloodRequest, id=id)
+    reqt.delete()
+    return redirect('/requestlist')
+
+def detailed_request(request,id):
+    reqt = get_object_or_404(UserBloodRequest, id=id)
+    return render(request,'request_details.html',{'data':reqt})
+
+
+
