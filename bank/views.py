@@ -3,6 +3,8 @@ from statistics import quantiles
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -37,7 +39,10 @@ def user_login(request):
             else:
                 return redirect('/userhome')
         else:
-            messages.error(request, "Invalid username or password.")
+            return render(request, 'login.html', {
+                'error_message': 'Invalid username or password..'
+            })
+
     return render(request, 'login.html')
 
 def user_logout(request):
@@ -253,4 +258,54 @@ def detailed_request(request,id):
     return render(request,'request_details.html',{'data':reqt})
 
 
+def view_profile(request):
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
+    return render(request,'profile.html',{'user':user})
+
+def update_profile(request):
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
+
+    if request.method == 'POST':
+        user.username = request.POST['uname']
+        user.first_name = request.POST['fname']
+        user.last_name = request.POST['lname']
+        user.email = request.POST['email']
+
+        user.save()
+        return redirect('/adminhome')
+
+    return render(request,'profile.html')
+
+def change_password(request):
+    if request.method == 'POST':
+        old_pass = request.POST['oldpass']
+        new_pass = request.POST['newpass']
+        cnf_pass = request.POST['cpass']
+        data = check_password(old_pass,request.user.password )
+        if data:
+            if new_pass == cnf_pass:
+                u = User.objects.get(id=request.user.id)
+                u.set_password(new_pass)
+                u.save()
+                logout(request)
+                return redirect('/')
+            else:
+                return render(request, 'changepass.html', {
+                    'error_message': 'password is not matching.'
+                })
+        else:
+            return render(request, 'changepass.html', {
+                'error_message': 'Enter the correct password.'
+            })
+
+    return render(request,'changepass.html')
+
+def inactivate_user(request):
+    user = User.objects.get(id=request.user.id)
+    user.is_active = False
+    user.save()
+    logout(request)
+    return redirect('/')
 

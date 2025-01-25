@@ -26,6 +26,10 @@ urlpatterns = [
         path('deleterequest/<int:id>', views.delete_request),
         path('detailedreqt/<int:id>',views.detailed_request),
         path('supply/<int:id>',views.supply_inventory),
+        path('viewprofile',views.view_profile),
+        path('updateprofile',views.update_profile),
+        path('changepass',views.change_password),
+        path('inactivate',views.inactivate_user)
 
 ]
 
