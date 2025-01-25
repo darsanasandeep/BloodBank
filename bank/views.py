@@ -1,11 +1,15 @@
+from statistics import quantiles
+
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from bank.forms import ExtendedUserCreationForm
-from bank.models import BloodDonor, BloodInventory
+from bank.models import BloodDonor, BloodInventory, DonationList, UserBloodRequest
 
 
 def user_registration(request):
@@ -35,7 +39,10 @@ def user_login(request):
             else:
                 return redirect('/userhome')
         else:
-            messages.error(request, "Invalid username or password.")
+            return render(request, 'login.html', {
+                'error_message': 'Invalid username or password..'
+            })
+
     return render(request, 'login.html')
 
 def user_logout(request):
@@ -61,7 +68,6 @@ def register_donor(request):
         health = request.POST['health']
         health_issue = request.POST['other-condition']
         group = request.POST['group']
-        qunty = request.POST['qunty']
         status = 'PENDING'
 
         # if health_issue is not None and health != 'none':
@@ -71,7 +77,7 @@ def register_donor(request):
             health = health_issue
 
         donor = BloodDonor(fullname=name,age=age,email=email,mobile_number=phone,address=address,
-                               gender=gender,health_issue=health,blood_type=group,quantity=qunty,status=status)
+                               gender=gender,health_issue=health,blood_type=group,status=status)
         donor.save()
         return redirect('/viewdonor')
     return render(request,'add_donor.html')
@@ -112,7 +118,6 @@ def update_donor(request, id):
         donor.health_issue = request.POST['health']
 
         donor.blood_type = request.POST['group']
-        donor.quantity = request.POST['qunty']
         donor.status = request.POST['status']
 
         donor.save()
@@ -131,24 +136,176 @@ def get_inventory(request):
     return render(request,'view_inventory.html',{'inventory':inventory})
 
 def collect_inventory(request,id):
-    inventory = BloodInventory.objects.get(id=id)
+    inventory = get_object_or_404(BloodInventory, id=id)
 
     if request.method == 'POST':
-        inventory.available_qnty += float (request.POST['qunty'])
+        quantity = float(request.POST['qunty'])
+        inventory.available_qnty += quantity
         inventory.save()
 
-    return render(request,'collect.html')
+        # Update donor collection status
+        donor = get_object_or_404(BloodDonor, id=request.POST['donor'])
+        data_list = DonationList(donor_id =donor.id ,name =donor.fullname ,blood_type = donor.blood_type,quantity = quantity ,status=True)
+        data_list.save()
+        return redirect('/inventorylist')
+
+    donors = BloodDonor.objects.filter(status='APPROVED')
+    return render(request,'collect.html',{'donors': donors})
 
 
 def supply_inventory(request, id):
-    inventory = BloodInventory.objects.get(id=id)
+    inventory = get_object_or_404(BloodInventory, id=id)
 
     if request.method == 'POST':
-        inventory.available_qnty -= float (request.POST['qunty'])
+        quantity = float(request.POST['qunty'])
+
+        if quantity > inventory.available_qnty:
+            # Return an error message if the entered quantity exceeds available quantity
+            reqt = UserBloodRequest.objects.filter(status='APPROVED')
+            return render(request, 'supply.html', {
+                'reqt': reqt,
+                'error_message': 'Entered quantity exceeds available inventory.'
+            })
+
+        inventory.available_qnty -= quantity
         inventory.save()
 
-    return render(request, 'supply_invent.html')
+        # Update donor collection status
+        data = get_object_or_404(UserBloodRequest, id=request.POST['requst'])
+        data.status = 'RECEIVED'
+        data.save()
+        return redirect('/inventorylist')
 
-def donor_list(request):
-    donors = BloodDonor.objects.all()  # Fetch all records
-    return render(request, 'collect.html', {'donors': donors})
+    reqt = UserBloodRequest.objects.filter(status='APPROVED')
+    return render(request, 'supply.html', {'reqt': reqt})
+
+def view_blood_request(request):
+    datas = UserBloodRequest.objects.all()
+    return render(request, 'view_request.html', {'datas': datas})
+
+
+def register_request(request):
+    user_id = request.user.id
+
+    if request.method == 'POST':
+        name = request.POST['fname']
+        age = request.POST['age']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        gender = request.POST.get('gender', None)
+        address = request.POST['addrs']
+        health = request.POST['reason']
+        group = request.POST['group']
+        quantity = request.POST['qunty']
+        status = 'PENDING'
+
+        datas = UserBloodRequest(name=name,age=age,email=email,mobile_number=phone,address=address,gender=gender,
+                        health_issue=health,blood_type=group,quantity= quantity,status=status,request_id=user_id)
+        datas.save()
+        return redirect('/requestlist')
+    return render(request,'request_form.html')
+
+def user_request_list(request,status=None):
+    search_data = request.GET.get('search', '').strip()
+    if search_data:
+        reqt = UserBloodRequest.objects.filter(
+            Q(name__icontains=search_data) |
+            Q(blood_type__icontains=search_data) |
+            Q(status__icontains=search_data)
+        )
+
+    elif status and status.upper() in ["APPROVED", "REJECTED", "PENDING"]:
+        reqt = UserBloodRequest.objects.filter(status=status.upper())
+    else:
+        reqt = UserBloodRequest.objects.all()
+
+    return render(request, 'req_verification.html', {'reqt': reqt})
+
+def approve_reject_request(request,id,status=None):
+    reqt = get_object_or_404(UserBloodRequest, id=id)
+    if status and status.upper() in ["APPROVED", "REJECTED"]:
+        reqt.status = status
+        reqt.save()
+        return redirect('/viewrequest')
+    return render(request, 'approve_reject.html',{'data':reqt})
+
+def update_request(request, id):
+    reqt = get_object_or_404(UserBloodRequest, id=id)
+
+    if request.method == 'POST':
+        reqt.name = request.POST['fname']
+        reqt.age = request.POST['age']
+        reqt.email = request.POST['email']
+        reqt.mobile_number = request.POST['phone']
+        reqt.gender = request.POST.get('gender', None)
+        reqt.address = request.POST['addrs']
+        reqt.health_issue = request.POST['health']
+        reqt.blood_type = request.POST['group']
+        reqt.quantity = request.POST['qunty']
+        reqt.save()
+        return redirect('/requestlist')
+
+    return render(request, 'approve_reject.html')
+
+
+def delete_request(request, id):
+    reqt = get_object_or_404(UserBloodRequest, id=id)
+    reqt.delete()
+    return redirect('/requestlist')
+
+def detailed_request(request,id):
+    reqt = get_object_or_404(UserBloodRequest, id=id)
+    return render(request,'request_details.html',{'data':reqt})
+
+
+def view_profile(request):
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
+    return render(request,'profile.html',{'user':user})
+
+def update_profile(request):
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
+
+    if request.method == 'POST':
+        user.username = request.POST['uname']
+        user.first_name = request.POST['fname']
+        user.last_name = request.POST['lname']
+        user.email = request.POST['email']
+
+        user.save()
+        return redirect('/adminhome')
+
+    return render(request,'profile.html')
+
+def change_password(request):
+    if request.method == 'POST':
+        old_pass = request.POST['oldpass']
+        new_pass = request.POST['newpass']
+        cnf_pass = request.POST['cpass']
+        data = check_password(old_pass,request.user.password )
+        if data:
+            if new_pass == cnf_pass:
+                u = User.objects.get(id=request.user.id)
+                u.set_password(new_pass)
+                u.save()
+                logout(request)
+                return redirect('/')
+            else:
+                return render(request, 'changepass.html', {
+                    'error_message': 'password is not matching.'
+                })
+        else:
+            return render(request, 'changepass.html', {
+                'error_message': 'Enter the correct password.'
+            })
+
+    return render(request,'changepass.html')
+
+def inactivate_user(request):
+    user = User.objects.get(id=request.user.id)
+    user.is_active = False
+    user.save()
+    logout(request)
+    return redirect('/')
+

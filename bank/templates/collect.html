@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Donor Registration</title>
+		<title>Blood Donation</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- MATERIAL DESIGN ICONIC FONT -->
@@ -11,6 +11,15 @@
 		<!-- STYLE static -->
         {% load static %}
         <link href="{% static 'loginstyle.css'%}" rel="stylesheet">
+		<div class="container">
+            <!-- Breadcrumb -->
+              <nav aria-label="breadcrumb" class="main-breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/adminhome">Home</a></li>
+                  <li class="breadcrumb-item"><a href="/viewdonor">Request List</a></li>
+                </ol>
+              </nav><br><br>
+              <!-- /Breadcrumb -->
 	</head>
 
 	<body>
@@ -19,24 +28,25 @@
 			<div class="inner">
 				<form method="post">
 					{% csrf_token %}
-					<h3>Donor Registration</h3>
+					<h3>Collect Blood</h3>
 
                     <div class="form-wrapper">
-                        <label for="fname">Blood Group</label>
-                        <select name="fname" id='fname' class="form-control">
-                            <option value="">Select Donor Name</option>
-                            {% for donor in donors %}
-                                <option value="{{ donor.fullname }}">{{ donor.fullname }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+						<label for="donor">Donor ID </label>
+						<select name="donor" id="donor" class="form-control">
+							<option value="">Select Donor ID</option>
+							{% for donor in donors %}
+								<option value="{{ donor.id }}">{{ donor.id }} - {{ donor.fullname }}</option>
+							{% endfor %}
+						</select>
+					</div>
 
                     <div class="form-wrapper">
 						<label for="qunty">Quantity</label>
-						<input name="qunty" type="number" class="form-control" required>
+						<input name="qunty" type="text" class="form-control" required>
 					</div>
 
-					<button type="submit">Register</button>
+					<button type="submit">Collect</button>
+
 
 
 				</form>

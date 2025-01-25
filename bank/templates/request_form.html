@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Donor Registration</title>
+		<title>Blood Request</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- MATERIAL DESIGN ICONIC FONT -->
@@ -19,10 +19,10 @@
 			<div class="inner">
 				<form method="post">
 					{% csrf_token %}
-					<h3>Donor Registration</h3>
+					<h3>Blood Request</h3>
                     <div class="form-group">
                         <div class="form-wrapper">
-                            <label for="fname">Donor name</label>
+                            <label for="fname">Full Name</label>
                             <input name="fname" type="text" class="form-control" required>
                         </div>
                         <div class="form-wrapper">
@@ -58,29 +58,9 @@
 						<label for="addrs">Address</label>
 						<input name="addrs" type="text" class="form-control" required>
 					</div>
-					<div class="form-wrapper">
-						<label for="health">Health Conditions</label>
-						<div id="health">
-							<label>
-								<input type="checkbox" name="health" value="diabetes"> Diabetes
-							</label>
-							<label>
-								<input type="checkbox" name="health" value="hypertension"> Hypertension
-							</label>
-							<label>
-								<input type="checkbox" name="health" value="asthma"> Asthma
-							</label>
-							<label>
-								<input type="checkbox" name="health" value="heart-disease"> Heart Disease
-							</label>
-							<label>
-								<input type="checkbox" name="health" value="none"> None
-							</label>
-							<label>
-								<input type="checkbox" id="other-condition-checkbox" name='health' value="other"> Other
-							</label>
-							<input type="text" id="other-condition-input" name="other-condition" class="form-control" style="display: none;" placeholder="Please specify">
-						</div>
+                    <div class="form-wrapper">
+						<label for="reason">Reason</label>
+						<input name="reason" type="text" class="form-control" required>
 					</div>
 
 					<div class="form-wrapper">
@@ -97,11 +77,16 @@
 							<option value="AB-">AB-</option>
 						</select>
 					</div>
-
-					<div style="text-align: left;">
-						<button type="submit" style="display: inline-block; margin-right: 10px;">Register</button>
-						<a href="/adminhome" style="background-color: green; padding: 13px 55px; text-decoration: none; color: white; cursor: pointer; border-radius: 50px; display: inline-block;">CANCEL</a>
+                    <div class="form-wrapper">
+						<label for="qunty">Quantity</label>
+						<input name="qunty" type="text" class="form-control" required>
 					</div>
+					<div style="text-align: left;">
+						<button type="submit" style="display: inline-block; margin-right: 10px;">Request</button>
+						<a href="/requestlist" style="background-color: green; padding: 13px 55px; text-decoration: none; color: white; cursor: pointer; border-radius: 50px; display: inline-block;">CANCEL</a>
+					</div>
+
+
 				</form>
 
 			</div>
