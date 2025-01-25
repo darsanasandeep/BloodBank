@@ -55,9 +55,9 @@
                                 <td>
 
                                     <a href="/detailedreqt/{{ data.id }}" class="filter-btn">View</a>
-                                    <a href="{% if data.status == 'Pending' %}#{% else %}/deleterequest/{{ data.id }}{% endif %}"
+                                    <a href="{% if data.status == 'PENDING' %}/deleterequest/{{ data.id }}{% else %}#{% endif %}"
                                         class="filter-btn"
-                                        style="{% if data.status == 'Pending' %}pointer-events: none; opacity: 0.5;{% endif %}">
+                                        style="{% if data.status != 'PENDING' %}pointer-events: none; opacity: 0.5;{% endif %}">
                                         Delete
                                     </a>
                                 </td>
